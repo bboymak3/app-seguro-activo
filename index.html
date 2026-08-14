@@ -171,9 +171,10 @@
     </div>
 
     <div class="actions">
-      <a href="#" class="btn" id="pdfLink" target="_blank">Descargar Póliza</a>
-      <a href="#" class="btn" id="carnetLink" target="_blank">Descargar Carnet</a>
+      <a href="#" class="btn" id="pdfLink" target="_blank" style="opacity:0.4;pointer-events:none">Descargar Póliza</a>
+      <a href="#" class="btn" id="carnetLink" target="_blank" style="opacity:0.4;pointer-events:none">Descargar Carnet</a>
     </div>
+    <p id="pendingMsg" style="display:none;text-align:center;color:#F7941D;font-size:0.82rem;margin-top:0.5rem">Los documentos estarán disponibles cuando la solicitud sea aprobada.</p>
 
     <div class="footer">
       <p>© 2026 Asociación Cooperativa Líder de Seguros para Vehículos R.L.</p>
@@ -260,6 +261,17 @@ function showResult(p) {
   setVal('r-prima', p.primaEur ? p.primaEur + '€' : p.prima);
   document.getElementById('pdfLink').href = `${API_BASE}/api/policies/${p.id}/pdf`;
   document.getElementById('carnetLink').href = `${API_BASE}/api/policies/${p.id}/carnet`;
+  // Habilitar botones solo si está APROBADA
+  const statusUpper = (p.status || 'PENDIENTE').toUpperCase();
+  if (statusUpper === 'APROBADA') {
+    document.getElementById('pdfLink').style.opacity = '1';
+    document.getElementById('pdfLink').style.pointerEvents = 'auto';
+    document.getElementById('carnetLink').style.opacity = '1';
+    document.getElementById('carnetLink').style.pointerEvents = 'auto';
+    document.getElementById('pendingMsg').style.display = 'none';
+  } else {
+    document.getElementById('pendingMsg').style.display = 'block';
+  }
 }
 
 function setVal(id, val) { document.getElementById(id).textContent = val || '—'; }
