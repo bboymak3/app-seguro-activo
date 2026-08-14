@@ -8,33 +8,43 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
-      background: #003366;
+      background: #fff;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    /* Diagonal orange stripe top-left */
+    /* Background banner — fixed, doesn't scroll */
+    #bgBanner {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 200px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      display: none;
+    }
+    /* Diagonal stripe top-left */
     .stripe {
       position: fixed; top: 0; left: 0;
-      width: 200px; height: 200px;
-      background: #F7941D;
-      transform: translate(-50%, -50%) rotate(45deg);
+      width: 150px; height: 150px;
+      background: linear-gradient(135deg, #003366 50%, #F7941D 50%);
+      clip-path: polygon(0 0, 100% 0, 0 100%);
       z-index: 0;
     }
-    /* Main container */
+    /* Main container — white, on top of banner */
     .container {
-      background: #F5F5F5;
-      border-radius: 20px;
+      background: #fff;
+      border-radius: 16px;
       max-width: 480px;
       width: 92%;
       margin: 2rem auto;
       padding: 1.5rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
       z-index: 1;
       position: relative;
     }
-    /* Title */
     .main-title {
       text-align: center;
       color: #003366;
@@ -45,10 +55,10 @@
       margin-bottom: 1.5rem;
       padding-bottom: 0.5rem;
     }
-    /* Section card */
     .section {
-      background: #fff;
-      border-radius: 12px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 10px;
       overflow: hidden;
       margin-bottom: 1.2rem;
     }
@@ -59,88 +69,39 @@
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
     }
     .section-body { padding: 1rem; }
     .data-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
       padding: 0.5rem 0;
       border-bottom: 1px solid #eee;
     }
     .data-row:last-child { border-bottom: none; }
-    .data-label {
-      color: #003366;
-      font-weight: 700;
-      font-size: 0.9rem;
-      min-width: 100px;
-    }
-    .data-value {
-      color: #003366;
-      font-weight: 400;
-      font-size: 0.9rem;
-      text-align: right;
-      flex: 1;
-      padding-left: 0.5rem;
-    }
-    /* Buttons */
-    .actions {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: center;
-      margin-top: 1.5rem;
-    }
+    .data-label { color: #003366; font-weight: 700; font-size: 0.9rem; min-width: 100px; }
+    .data-value { color: #333; font-size: 0.9rem; text-align: right; flex: 1; padding-left: 0.5rem; }
+    .actions { display: flex; gap: 0.8rem; justify-content: center; margin-top: 1.5rem; }
     .btn {
-      background: #F7941D;
-      color: #fff;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 25px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      transition: opacity 0.2s;
+      background: #F7941D; color: #fff; border: none;
+      padding: 0.7rem 1.5rem; border-radius: 25px;
+      font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: none;
     }
     .btn:hover { opacity: 0.85; }
-    /* Footer */
-    .footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid #ddd;
-    }
-    .footer p {
-      color: #666;
-      font-size: 0.72rem;
-      line-height: 1.5;
-    }
-    /* Search section */
+    .footer { text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #ddd; }
+    .footer p { color: #666; font-size: 0.72rem; line-height: 1.5; }
     .search-section { text-align: center; padding: 1rem 0; }
     .search-section h1 { color: #003366; font-size: 1.3rem; margin-bottom: 0.5rem; }
     .search-section p { color: #666; font-size: 0.85rem; margin-bottom: 1.2rem; }
     .search-input {
-      width: 100%;
-      padding: 0.8rem;
-      border: 2px solid #003366;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      text-align: center;
-      margin-bottom: 0.8rem;
+      width: 100%; padding: 0.8rem; border: 2px solid #003366;
+      border-radius: 8px; font-size: 1.1rem; text-align: center; margin-bottom: 0.8rem;
     }
     .search-btn {
-      background: #F7941D;
-      color: #fff;
-      border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 25px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
+      background: #F7941D; color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 25px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; width: 100%;
     }
-    .search-btn:disabled { opacity: 0.4; cursor: wait; }
+    .search-btn:disabled { opacity: 0.4; }
     .status-msg { font-size: 0.82rem; margin-top: 0.5rem; font-weight: 600; color: #003366; }
     .result-section { display: none; }
     .result-section.show { display: block; }
@@ -150,38 +111,22 @@
       border-radius: 50%; animation: spin 0.6s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    /* Status badge */
     .status-badge {
-      display: inline-block;
-      padding: 0.3rem 1rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
+      display: inline-block; padding: 0.3rem 1rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;
     }
     .status-badge.aprobada { background: #2E7D32; color: #fff; }
     .status-badge.pendiente { background: #F7941D; color: #fff; }
     .status-badge.rechazada { background: #c62828; color: #fff; }
     .result-header { text-align: center; margin-bottom: 1rem; }
     .result-header .icon { font-size: 2rem; margin-bottom: 0.3rem; }
-    @media print {
-      body { background: #fff; }
-      .stripe { display: none; }
-      .container { box-shadow: none; max-width: 100%; margin: 0; border-radius: 0; }
-      .actions, .search-section { display: none; }
-    }
+    @media print { body { background: #fff; } .stripe, .actions, .search-section { display: none; } .container { box-shadow: none; } }
   </style>
 </head>
 <body>
 
 <div class="stripe"></div>
-
-<!-- Banner (configurable from admin) -->
-<div id="bannerContainer" style="display:none;width:92%;max-width:480px;margin:2rem auto 0;text-align:center;z-index:1;position:relative;">
-  <img id="bannerImage" src="" alt="Banner" style="width:100%;border-radius:12px;border:2px solid #003366;display:none;">
-  <h2 id="bannerTitle" style="color:#F7941D;margin-top:0.5rem;display:none;"></h2>
-  <p id="bannerSubtitle" style="color:#fff;display:none;"></p>
-</div>
+<div id="bgBanner"></div>
 
 <div class="container">
   <!-- Search -->
@@ -240,101 +185,61 @@
 const API_BASE = 'https://appseguros.estilosgrado33.workers.dev';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Load banner config from admin
   loadBanner();
-  
   const params = new URLSearchParams(window.location.search);
   const code = params.get('v');
-  if (code) {
-    document.getElementById('codeInput').value = code;
-    verify();
-  }
-  document.getElementById('codeInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') verify();
-  });
+  if (code) { document.getElementById('codeInput').value = code; verify(); }
+  document.getElementById('codeInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') verify(); });
 });
 
 async function verify() {
   const code = document.getElementById('codeInput').value.trim();
   const btn = document.getElementById('verifyBtn');
   const status = document.getElementById('status');
-
   if (!code) { status.textContent = 'Ingresa un código'; return; }
-
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
   status.textContent = 'Consultando...';
-
   try {
     const res = await fetch(`${API_BASE}/api/policies/verify?code=${code}`);
     const data = await res.json();
-
-    if (!res.ok) {
-      status.textContent = '⚠️ ' + (data.error || 'No se encontró la póliza');
-      btn.disabled = false; btn.innerHTML = 'Consultar';
-      return;
-    }
-
+    if (!res.ok) { status.textContent = '⚠️ ' + (data.error || 'No se encontró'); btn.disabled = false; btn.innerHTML = 'Consultar'; return; }
     showResult(data.policy);
-  } catch (e) {
-    status.textContent = '⚠️ Error: ' + e.message;
-  } finally {
-    btn.disabled = false; btn.innerHTML = 'Consultar';
-  }
+  } catch (e) { status.textContent = '⚠️ Error: ' + e.message; }
+  finally { btn.disabled = false; btn.innerHTML = 'Consultar'; }
 }
 
 function showResult(p) {
   document.getElementById('searchSection').style.display = 'none';
   document.getElementById('resultSection').classList.add('show');
-
   const status = (p.status || 'PENDIENTE').toUpperCase();
   const badge = document.getElementById('statusBadge');
   badge.className = 'status-badge ' + status.toLowerCase();
   badge.textContent = status;
   document.getElementById('resultIcon').textContent = status === 'APROBADA' ? '✅' : status === 'RECHAZADA' ? '❌' : '⏳';
-
-  // Vehículo
   setVal('r-vence', p.vigenciaHasta);
   setVal('r-marca', p.marca);
   setVal('r-modelo', p.modelo || p.ano);
   setVal('r-color', p.color);
   setVal('r-placa', p.placa);
-
-  // Personal
   const fullName = [p.asegNombre || p.nombre, p.asegApellido || p.apellido].filter(Boolean).join(' ');
   setVal('r-nombre', fullName);
   setVal('r-plan', p.plan);
   setVal('r-cedula', p.asegCedula || p.cedula);
   setVal('r-poliza', p.policyNumber || p.verifyCode);
-  const prima = p.primaEur ? p.primaEur + '€' : p.prima;
-  setVal('r-prima', prima);
-
+  setVal('r-prima', p.primaEur ? p.primaEur + '€' : p.prima);
   document.getElementById('pdfLink').href = `${API_BASE}/api/policies/${p.id}/pdf`;
 }
 
-function setVal(id, val) {
-  document.getElementById(id).textContent = val || '—';
-}
+function setVal(id, val) { document.getElementById(id).textContent = val || '—'; }
 
 async function loadBanner() {
   try {
     const res = await fetch(`${API_BASE}/api/banner`);
     const data = await res.json();
-    if (data.banner && data.banner.enabled !== false) {
-      const container = document.getElementById('bannerContainer');
-      container.style.display = 'block';
-      if (data.banner.imageUrl) {
-        const img = document.getElementById('bannerImage');
-        img.src = data.banner.imageUrl;
-        img.style.display = 'block';
-      }
-      if (data.banner.title) {
-        document.getElementById('bannerTitle').textContent = data.banner.title;
-        document.getElementById('bannerTitle').style.display = 'block';
-      }
-      if (data.banner.subtitle) {
-        document.getElementById('bannerSubtitle').textContent = data.banner.subtitle;
-        document.getElementById('bannerSubtitle').style.display = 'block';
-      }
+    if (data.banner && data.banner.enabled !== false && data.banner.imageUrl) {
+      const bg = document.getElementById('bgBanner');
+      bg.style.backgroundImage = `url(${data.banner.imageUrl})`;
+      bg.style.display = 'block';
     }
   } catch (e) { /* ignore */ }
 }
