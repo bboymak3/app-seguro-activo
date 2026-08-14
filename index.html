@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguros Líder — Verificación de Póliza</title>
+  <meta name="description" content="Verifica tu póliza de seguro vehicular.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #000; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: #fff; border-bottom: 2px solid #000; padding: 0 1.5rem; height: 64px; display: flex; align-items: center; justify-content: center; }
+    .logo { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 1.1rem; }
+    .logo-icon { width: 36px; height: 36px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; }
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1.5rem; }
+    .verify-card { background: #fff; border: 2px solid #000; max-width: 500px; width: 100%; padding: 2.5rem; text-align: center; }
+    .verify-card h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .verify-card p { color: #333; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .input-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .input-row input { flex: 1; padding: 0.8rem; border: 2px solid #000; font-size: 1.1rem; text-align: center; letter-spacing: 0.05em; }
+    .btn { background: #000; color: #fff; border: 2px solid #000; padding: 0.8rem 1.5rem; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+    .btn:hover { background: #fff; color: #000; }
+    .btn:disabled { opacity: 0.4; cursor: wait; }
+    .status { font-size: 0.85rem; margin-top: 0.5rem; font-weight: 600; min-height: 1.2em; }
+    .status.error { color: #000; }
+    .status.success { color: #000; }
+    /* Result */
+    .result { display: none; text-align: left; }
+    .result.show { display: block; }
+    .result-header { text-align: center; margin-bottom: 1.5rem; }
+    .result-header .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .result-header h2 { font-size: 1.3rem; }
+    .result-status { display: inline-block; padding: 0.3rem 1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; margin-top: 0.5rem; }
+    .result-status.aprobada { background: #000; color: #fff; }
+    .result-status.pendiente { background: #fff; color: #000; border: 2px solid #000; }
+    .result-status.rechazada { background: #fff; color: #000; border: 2px solid #000; }
+    .info-section { border: 1px solid #000; margin-bottom: 1rem; }
+    .info-section-title { background: #000; color: #fff; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .info-section-body { padding: 1rem; }
+    .info-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: #333; font-weight: 600; }
+    .info-row .value { color: #000; font-weight: 700; text-align: right; }
+    .actions { text-align: center; margin-top: 1.5rem; display: flex; gap: 0.5rem; justify-content: center; }
+    .btn-outline { background: #fff; color: #000; border: 2px solid #000; padding: 0.6rem 1.2rem; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-outline:hover { background: #000; color: #fff; }
+    footer { border-top: 2px solid #000; padding: 1rem; text-align: center; color: #333; font-size: 0.8rem; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media print { header, footer, .actions, .input-row, .verify-card > p, .status { display: none; } .verify-card { border: none; max-width: 100%; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-icon">🛡️</div><span>Seguros Líder</span></div>
+</header>
+
+<main>
+  <div class="verify-card">
+    <!-- Search form -->
+    <div id="searchSection">
+      <h1>Verificación de Póliza</h1>
+      <p>Ingresa tu código de verificación para consultar el estado de tu póliza.</p>
+      <div class="input-row">
+        <input type="text" id="codeInput" placeholder="Código de verificación" oninput="this.value=this.value.replace(/\D/g,'')">
+        <button class="btn" onclick="verify()" id="verifyBtn">Consultar</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="result" id="resultSection">
+      <div class="result-header">
+        <div class="icon" id="resultIcon">✅</div>
+        <h2>Certificado de Póliza</h2>
+        <div class="result-status" id="resultStatus">—</div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-section-title">📋 Datos del Tomador</div>
+        <div class="info-section-body">
+          <div class="info-row"><span class="label">Nombre</span><span class="value" id="r-nombre">—</span></div>
+          <div class="info-row"><span class="label">Cédula</span><span class="value" id="r-cedula">—</span></div>
+          <div class="info-row"><span class="label">Teléfono</span><span class="value" id="r-telefono">—</span></div>
+          <div class="info-row"><span class="label">Email</span><span class="value" id="r-email">—</span></div>
+          <div class="info-row"><span class="label">Estado</span><span class="value" id="r-estado">—</span></div>
+          <div class="info-row"><span class="label">Municipio</span><span class="value" id="r-municipio">—</span></div>
+          <div class="info-row"><span class="label">Dirección</span><span class="value" id="r-direccion">—</span></div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-section-title">🚗 Datos del Vehículo</div>
+        <div class="info-section-body">
+          <div class="info-row"><span class="label">Placa</span><span class="value" id="r-placa">—</span></div>
+          <div class="info-row"><span class="label">Marca</span><span class="value" id="r-marca">—</span></div>
+          <div class="info-row"><span class="label">Modelo</span><span class="value" id="r-modelo">—</span></div>
+          <div class="info-row"><span class="label">Año</span><span class="value" id="r-ano">—</span></div>
+          <div class="info-row"><span class="label">Color</span><span class="value" id="r-color">—</span></div>
+          <div class="info-row"><span class="label">Serial Carrocería</span><span class="value" id="r-serial">—</span></div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-section-title">🛡️ Datos de la Póliza</div>
+        <div class="info-section-body">
+          <div class="info-row"><span class="label">N° Póliza</span><span class="value" id="r-poliza-num">—</span></div>
+          <div class="info-row"><span class="label">Plan</span><span class="value" id="r-plan">—</span></div>
+          <div class="info-row"><span class="label">Prima EUR</span><span class="value" id="r-prima-eur">—</span></div>
+          <div class="info-row"><span class="label">Prima USD</span><span class="value" id="r-prima-usd">—</span></div>
+          <div class="info-row"><span class="label">Prima Bs</span><span class="value" id="r-prima-bs">—</span></div>
+          <div class="info-row"><span class="label">Vigencia Desde</span><span class="value" id="r-vigencia-desde">—</span></div>
+          <div class="info-row"><span class="label">Vigencia Hasta</span><span class="value" id="r-vigencia-hasta">—</span></div>
+          <div class="info-row"><span class="label">Fecha de Creación</span><span class="value" id="r-creada">—</span></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a href="#" class="btn-outline" id="pdfLink" target="_blank">📄 Descargar PDF</a>
+        <button class="btn-outline" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn-outline" onclick="resetView()">🔍 Nueva Consulta</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>© 2025 Seguros Líder — Verificación de Pólizas</footer>
+
+<script>
+const API_BASE = 'https://appseguros.estilosgrado33.workers.dev';
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Check URL for ?v=CODE
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('v');
+  if (code) {
+    document.getElementById('codeInput').value = code;
+    verify();
+  }
+  // Enter key
+  document.getElementById('codeInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') verify();
+  });
+});
+
+async function verify() {
+  const code = document.getElementById('codeInput').value.trim();
+  const btn = document.getElementById('verifyBtn');
+  const status = document.getElementById('status');
+
+  if (!code) { status.className = 'status error'; status.textContent = 'Ingresa un código'; return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  status.className = 'status'; status.textContent = 'Consultando...';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/policies/verify?code=${code}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      status.className = 'status error';
+      status.textContent = '⚠️ ' + (data.error || 'No se encontró la póliza');
+      btn.disabled = false; btn.innerHTML = 'Consultar';
+      return;
+    }
+
+    showResult(data.policy);
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = '⚠️ Error: ' + e.message;
+  } finally {
+    btn.disabled = false; btn.innerHTML = 'Consultar';
+  }
+}
+
+function showResult(p) {
+  document.getElementById('searchSection').style.display = 'none';
+  document.getElementById('resultSection').classList.add('show');
+
+  // Status badge
+  const statusEl = document.getElementById('resultStatus');
+  const iconEl = document.getElementById('resultIcon');
+  const status = (p.status || 'PENDIENTE').toUpperCase();
+  statusEl.className = 'result-status ' + status.toLowerCase();
+  statusEl.textContent = status;
+  iconEl.textContent = status === 'APROBADA' ? '✅' : status === 'RECHAZADA' ? '❌' : '⏳';
+
+  // Tomador
+  setVal('r-nombre', p.asegNombre || p.nombre, p.asegApellido || p.apellido);
+  setVal('r-cedula', p.asegCedula || p.cedula);
+  setVal('r-telefono', p.tomTelefono || p.telefono);
+  setVal('r-email', p.asegEmail || p.email);
+  setVal('r-estado', p.tomEstado || p.estado);
+  setVal('r-municipio', p.tomMunicipio);
+  setVal('r-direccion', p.tomDireccion || p.direccion);
+
+  // Vehículo
+  setVal('r-placa', p.placa);
+  setVal('r-marca', p.marca);
+  setVal('r-modelo', p.modelo);
+  setVal('r-ano', p.ano);
+  setVal('r-color', p.color);
+  setVal('r-serial', p.serialCarroceria);
+
+  // Póliza
+  setVal('r-poliza-num', p.policyNumber || p.verifyCode);
+  setVal('r-plan', p.plan);
+  setVal('r-prima-eur', p.primaEur ? p.primaEur + ' €' : null);
+  setVal('r-prima-usd', p.primaUsd ? p.primaUsd + ' $' : null);
+  setVal('r-prima-bs', p.primaBs ? p.primaBs + ' Bs' : null);
+  setVal('r-vigencia-desde', p.vigenciaDesde);
+  setVal('r-vigencia-hasta', p.vigenciaHasta);
+  setVal('r-creada', p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-VE') : null);
+
+  // PDF link
+  document.getElementById('pdfLink').href = `${API_BASE}/api/policies/${p.id}/pdf`;
+}
+
+function setVal(id, ...vals) {
+  const el = document.getElementById(id);
+  const val = vals.filter(Boolean).join(' ').trim();
+  el.textContent = val || '—';
+}
+
+function resetView() {
+  document.getElementById('searchSection').style.display = 'block';
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('codeInput').value = '';
+  document.getElementById('status').textContent = '';
+  window.history.replaceState({}, '', window.location.pathname);
+}
+</script>
+
+</body>
+</html>
