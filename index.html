@@ -176,6 +176,13 @@
 
 <div class="stripe"></div>
 
+<!-- Banner (configurable from admin) -->
+<div id="bannerContainer" style="display:none;width:92%;max-width:480px;margin:2rem auto 0;text-align:center;z-index:1;position:relative;">
+  <img id="bannerImage" src="" alt="Banner" style="width:100%;border-radius:12px;border:2px solid #003366;display:none;">
+  <h2 id="bannerTitle" style="color:#F7941D;margin-top:0.5rem;display:none;"></h2>
+  <p id="bannerSubtitle" style="color:#fff;display:none;"></p>
+</div>
+
 <div class="container">
   <!-- Search -->
   <div class="search-section" id="searchSection">
@@ -233,6 +240,9 @@
 const API_BASE = 'https://appseguros.estilosgrado33.workers.dev';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Load banner config from admin
+  loadBanner();
+  
   const params = new URLSearchParams(window.location.search);
   const code = params.get('v');
   if (code) {
@@ -303,6 +313,30 @@ function showResult(p) {
 
 function setVal(id, val) {
   document.getElementById(id).textContent = val || '—';
+}
+
+async function loadBanner() {
+  try {
+    const res = await fetch(`${API_BASE}/api/banner`);
+    const data = await res.json();
+    if (data.banner && data.banner.enabled !== false) {
+      const container = document.getElementById('bannerContainer');
+      container.style.display = 'block';
+      if (data.banner.imageUrl) {
+        const img = document.getElementById('bannerImage');
+        img.src = data.banner.imageUrl;
+        img.style.display = 'block';
+      }
+      if (data.banner.title) {
+        document.getElementById('bannerTitle').textContent = data.banner.title;
+        document.getElementById('bannerTitle').style.display = 'block';
+      }
+      if (data.banner.subtitle) {
+        document.getElementById('bannerSubtitle').textContent = data.banner.subtitle;
+        document.getElementById('bannerSubtitle').style.display = 'block';
+      }
+    }
+  } catch (e) { /* ignore */ }
 }
 </script>
 
