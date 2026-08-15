@@ -206,7 +206,10 @@ async function verify() {
     const data = await res.json();
     if (!res.ok) { status.textContent = '⚠️ ' + (data.error || 'No se encontró'); btn.disabled = false; btn.innerHTML = 'Consultar'; return; }
     showResult(data.policy);
-  } catch (e) { status.textContent = '⚠️ Error: ' + e.message; }
+  } catch (e) {
+    status.textContent = '⚠️ No se pudo conectar con el servidor. Verifica tu conexión e intenta nuevamente.';
+    console.error('Fetch error:', e);
+  }
   finally { btn.disabled = false; btn.innerHTML = 'Consultar'; }
 }
 
