@@ -142,11 +142,6 @@
   <div class="result-section" id="resultSection">
     <div class="main-title">Detalles del Vehículo</div>
 
-    <div class="result-header" id="resultHeader">
-      <div class="icon" id="resultIcon">✅</div>
-      <div class="status-badge" id="statusBadge">—</div>
-    </div>
-
     <div class="section">
       <div class="section-header">Información del Vehículo</div>
       <div class="section-body">
@@ -216,11 +211,6 @@ async function verify() {
 function showResult(p) {
   document.getElementById('searchSection').style.display = 'none';
   document.getElementById('resultSection').classList.add('show');
-  const status = (p.status || 'PENDIENTE').toUpperCase();
-  const badge = document.getElementById('statusBadge');
-  badge.className = 'status-badge ' + status.toLowerCase();
-  badge.textContent = status;
-  document.getElementById('resultIcon').textContent = status === 'APROBADA' ? '✅' : status === 'RECHAZADA' ? '❌' : '⏳';
   // Calcular fecha de vencimiento (emisión + 1 año)
   const fechaEmision = p.vigenciaDesde || p.createdAt;
   let venceTexto = '—';
