@@ -111,15 +111,6 @@
       border-radius: 50%; animation: spin 0.6s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .status-badge {
-      display: inline-block; padding: 0.3rem 1rem; border-radius: 999px;
-      font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;
-    }
-    .status-badge.aprobada { background: #2E7D32; color: #fff; }
-    .status-badge.pendiente { background: #F7941D; color: #fff; }
-    .status-badge.rechazada { background: #c62828; color: #fff; }
-    .result-header { text-align: center; margin-bottom: 1rem; }
-    .result-header .icon { font-size: 2rem; margin-bottom: 0.3rem; }
     @media print { body { background: #fff; } .stripe, .actions, .search-section { display: none; } .container { box-shadow: none; } }
   </style>
 </head>
@@ -146,7 +137,6 @@
       <div class="section-header">Información del Vehículo</div>
       <div class="section-body">
         <div class="data-row"><span class="data-label">Vence:</span><span class="data-value" id="r-vence">—</span></div>
-        <div class="data-row"><span class="data-label">Estado:</span><span class="data-value" id="r-vigencia-estado">—</span></div>
         <div class="data-row"><span class="data-label">Marca:</span><span class="data-value" id="r-marca">—</span></div>
         <div class="data-row"><span class="data-label">Modelo:</span><span class="data-value" id="r-modelo">—</span></div>
         <div class="data-row"><span class="data-label">Color:</span><span class="data-value" id="r-color">—</span></div>
@@ -208,40 +198,25 @@ async function verify() {
   finally { btn.disabled = false; btn.innerHTML = 'Consultar'; }
 }
 
+// Calcula la fecha de vencimiento = fecha de solicitud (createdAt) + 365 días
+function calcularVencimiento(createdAt) {
+  if (!createdAt) return '—';
+  let fecha = new Date(createdAt);
+  if (isNaN(fecha.getTime())) {
+    // Intentar formato dd/mm/yyyy
+    const parts = String(createdAt).split('/');
+    if (parts.length === 3) fecha = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  }
+  if (isNaN(fecha.getTime())) return '—';
+  fecha.setDate(fecha.getDate() + 365);
+  return fecha.toLocaleDateString('es-VE');
+}
+
 function showResult(p) {
   document.getElementById('searchSection').style.display = 'none';
   document.getElementById('resultSection').classList.add('show');
-  // Calcular fecha de vencimiento (emisión + 1 año)
-  const fechaEmision = p.vigenciaDesde || p.createdAt;
-  let venceTexto = '—';
-  let estadoVigencia = '—';
-  if (fechaEmision) {
-    let fecha;
-    const iso = new Date(fechaEmision);
-    if (!isNaN(iso.getTime())) {
-      fecha = new Date(iso);
-    } else {
-      const parts = String(fechaEmision).split('/');
-      if (parts.length === 3) fecha = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      else fecha = new Date(fechaEmision);
-    }
-    if (isNaN(fecha.getTime())) fecha = new Date();
-    fecha.setFullYear(fecha.getFullYear() + 1);
-    venceTexto = fecha.toLocaleDateString('es-VE');
-    // Determinar si está vigente o vencida
-    const ahora = new Date();
-    if (fecha >= ahora) {
-      estadoVigencia = 'VIGENTE';
-      document.getElementById('r-vigencia-estado').style.color = '#2E7D32';
-      document.getElementById('r-vigencia-estado').style.fontWeight = '700';
-    } else {
-      estadoVigencia = 'VENCIDA';
-      document.getElementById('r-vigencia-estado').style.color = '#c62828';
-      document.getElementById('r-vigencia-estado').style.fontWeight = '700';
-    }
-  }
-  setVal('r-vence', venceTexto);
-  setVal('r-vigencia-estado', estadoVigencia);
+  // Vence = fecha de solicitud (createdAt) + 365 días
+  setVal('r-vence', calcularVencimiento(p.createdAt));
   setVal('r-marca', p.marca);
   setVal('r-modelo', p.modelo || p.ano);
   setVal('r-color', p.color);
